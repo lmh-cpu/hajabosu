@@ -1,0 +1,3 @@
+# 상단 Deploy 버튼과 개발자 메뉴 숨김
+[client]
+toolbarMode = "minimal"

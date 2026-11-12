@@ -1,0 +1,6 @@
+.env
+__pycache__/
+.streamlit/secrets.toml
+data/하자보수.db
+output/*
+!output/.keep

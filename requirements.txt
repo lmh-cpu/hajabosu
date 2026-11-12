@@ -1,0 +1,8 @@
+streamlit
+anthropic
+python-dotenv
+pandas
+openpyxl
+docxtpl
+sqlalchemy
+psycopg[binary]
