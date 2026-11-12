@@ -4,6 +4,7 @@ import pandas as pd
 import streamlit as st
 
 import ai
+import db
 import rules
 import run
 
@@ -88,7 +89,7 @@ with tab1:
 
 # ---------------------------------------------------------------- 하자대장
 with tab2:
-    if st.button("접수함 전체 처리하고 하자대장.csv 저장"):
+    if st.button("접수함 전체 처리하고 하자대장(DB)에 저장"):
         행들, 번호들, 실패 = [], [], []
         진행 = st.progress(0.0)
         for i, 파일 in enumerate(파일들):
@@ -106,8 +107,9 @@ with tab2:
         for 메시지 in 실패:
             st.error(메시지)
 
-    if run.출력파일.exists():
-        대장 = pd.read_csv(run.출력파일, encoding="utf-8-sig", dtype=str).fillna("")
+    대장행 = db.조회()
+    if 대장행:
+        대장 = pd.DataFrame(대장행, columns=db.열).astype(str).replace({"None": "", "NaT": ""})
         건수 = lambda 열, 값: int((대장[열] == 값).sum())
         m = st.columns(4)
         m[0].metric("전체", len(대장))
@@ -116,4 +118,4 @@ with tab2:
         m[3].metric("확인필요", 건수("상태", "확인필요"))
         st.dataframe(대장, hide_index=True, width="stretch")
     else:
-        st.info("아직 하자대장.csv가 없습니다. 위 버튼으로 만드세요.")
+        st.info("아직 하자대장에 저장된 건이 없습니다. 위 버튼으로 만드세요.")

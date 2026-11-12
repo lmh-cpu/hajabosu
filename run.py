@@ -1,4 +1,4 @@
-"""접수함 폴더의 원문을 모두 처리해 하자대장.csv로 저장한다.
+"""접수함 폴더의 원문을 모두 처리해 하자대장(DB)에 저장한다.
 흐름: 원문 읽기(코드) -> 접수정리(AI) -> 번호·기한·판정(rules.py) -> 저장(코드)"""
 import csv
 import re
@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 import ai
+import db
 import rules
 
 BASE = Path(__file__).parent
@@ -50,11 +51,8 @@ def 처리(파일: Path, 기존번호: list[str], 공사목록, 정리: dict | N
 
 
 def 저장(행들: list[dict]):
-    with open(출력파일, "w", encoding="utf-8-sig", newline="") as f:  # utf-8-sig: 엑셀에서 한글 깨짐 방지
-        w = csv.DictWriter(f, fieldnames=열)
-        w.writeheader()
-        for 행 in 행들:
-            w.writerow({k: ("" if 행.get(k) is None else 행[k]) for k in 열})
+    """하자대장 저장은 db.py가 한다. (data/하자대장.csv는 DB로 옮기기 전의 기록으로 남겨 둔다)"""
+    return db.저장(행들)
 
 
 def main():
@@ -73,7 +71,7 @@ def main():
         print(f"[완료] {행['접수번호']} {파일.name}")
 
     저장(행들)
-    print(f"\n{len(행들)}건 저장, {len(실패)}건 실패 -> {출력파일}")
+    print(f"\n{len(행들)}건 DB 저장, {len(실패)}건 실패")
     return 1 if 실패 else 0
 
 
