@@ -86,8 +86,9 @@ def _값(열이름: str, 값):
     return 값
 
 
-def 저장(행들: list[dict]) -> int:
-    """하자대장에 저장한다. 접수번호가 같으면 덮어쓰고, 없으면 넣는다. 저장한 건수를 돌려준다."""
+def 저장(행들: list[dict], 완료: list[tuple[int, str]] | None = None) -> int:
+    """하자대장에 저장한다. 접수번호가 같으면 덮어쓰고, 없으면 넣는다. 저장한 건수를 돌려준다.
+    완료 = [(접수 id, 접수번호), ...]를 주면 같은 거래 안에서 그 접수를 '처리완료'로 바꾸고 접수번호를 적는다."""
     if not 행들:
         return 0
     이름 = [f"p{i}" for i in range(len(열))]
@@ -99,6 +100,9 @@ def 저장(행들: list[dict]) -> int:
     자료 = [{n: _값(k, 행.get(k)) for n, k in zip(이름, 열)} for 행 in 행들]
     with 엔진().begin() as c:
         c.execute(sql, 자료)
+        for 접수id, 번호 in 완료 or []:
+            c.execute(text(f'UPDATE "{접수테이블}" SET "처리상태" = \'처리완료\', "접수번호" = :n '
+                           'WHERE "id" = :i'), {"n": 번호, "i": 접수id})
     return len(자료)
 
 
